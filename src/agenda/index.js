@@ -174,18 +174,22 @@ export default class AgendaView extends Component {
   }
 
   onVisibleMonthsChange(months) {
+  
+    isBack = months[0].timestamp < this.state.selectedDay.getTime();
     if (this.props.items && !this.state.firstResevationLoad) {
       clearTimeout(this.scrollTimeout);
       this.scrollTimeout = setTimeout(() => {
         if (this.props.loadItemsForMonth && this._isMounted) {
-          this.props.loadItemsForMonth(months[0]);
+          const nextMonthIndex = isBack ? 0 : 1;
+          this.props.loadItemsForMonth(months[nextMonthIndex]);
         }
       }, 200);
     }
   }
 
-  loadReservations(props) {
-    if ((!props.items || !Object.keys(props.items).length) && !this.state.firstResevationLoad) {
+  loadReservations(props) { // initialy 
+    
+    if (!this.state.firstResevationLoad) {
       this.setState({
         firstResevationLoad: true
       }, () => {
@@ -306,6 +310,12 @@ export default class AgendaView extends Component {
     const key = this.state.selectedDay.toString('yyyy-MM-dd');
     return {...markings, [key]: {...(markings[key] || {}), ...{selected: true}}};
   }
+
+  // shouldComponentUpdate(nextProps,nextState) {
+  //   console.log(`ITEM CHANGES: ${nextProps.totalJobsCount} > ${this.props.totalJobsCount}`);
+  //   return nextProps.totalJobsCount > this.props.totalJobsCount;
+
+  // }
 
   render() {
     const agendaHeight = Math.max(0, this.viewHeight - HEADER_HEIGHT);
